@@ -1,8 +1,8 @@
 // author : 0aqz0
 // date: 2018/11/1
-import Maze 1.0 as Maze
+//import Maze 1.0 as Maze
 import QtQuick 2.6
-import QtQuick.Controls 1.1
+import QtQuick.Controls 2.0
 //import QtQuick.Controls.Styles 1.4
 
 Rectangle{
@@ -12,12 +12,34 @@ Rectangle{
 
     SystemPalette { id: activePalette }
 
-    Maze.Maze{
-        id : maze
+    function updateqml(){
+        console.log("update")
+        for (var i = 0; i < mazeview.contentItem.children.length - 1; i++){
+//            console.log(mazeview.contentItem.children[i].color)
+//            console.log(maze.obsnum())
+//            mazeview.contentItem.children[i].color = "red"
+            if(mazeview.contentItem.children[i].id == maze.robotstring()){
+//                console.log(mazeview.currentItem.id)
+                mazeview.contentItem.children[i].color = "red"
+            }
+//            else if(mazeview.contentItem.children[i].id == maze.endstring()){
+//                mazeview.contentItem.children[i].color = "green"
+//            }
+//            else{
+//                for(var j = 0; j < maze.obsnum(); j++){
+////                    console.log(maze.obsstring())
+//                    if(mazeview.contentItem.children[i].id == maze.obsstring()[j])
+//                        mazeview.contentItem.children[i].color = "black"
+//                }
+//            }
+        }
+//        var timeStart = new Date().getTime();
+//        while (new Date().getTime() - timeStart < 500) {
+//            // Do nothing
+//        }
     }
 
     property int mode : 0
-
 //  1-----set the start
 //  2-----set the end
 //  3-----set obstacle
@@ -25,15 +47,6 @@ Rectangle{
 //  5-----reset
 //  6-----quit
 
-//    Timer{
-//        id:globaltimer;
-//        interval:15;//15ms启动一次
-//        running:true;
-//        repeat:true;
-//        onTriggered: {
-//            startID = maze.stringstart
-//        }
-//    }
     Rectangle {
         id : map
         width: 900; height: 900
@@ -132,6 +145,7 @@ Rectangle{
             ListElement { name: "(9,9)"; colors : "white"; ix : 9; iy : 9 }
         }
         GridView {
+            id : mazeview
             anchors.fill: parent
             cellWidth: 100; cellHeight: 100
             focus: true
@@ -139,65 +153,28 @@ Rectangle{
 
             highlight: Rectangle { width: 100; height: 100; color: "lightsteelblue" }
 
-            delegate: Item {
+            delegate: Rectangle {
                 width: 100; height: 100
-
-                Image {
-                    width: 100; height: 100
-                    source: "image/end"
-                }
+                color: "white"
+                border.color : "grey"
+                property string id : name
+//                Image {
+//                    width: 100; height: 100
+//                    source: "image/end"
+//                }
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-//                        console.log(ix)
-//                        console.log(iy)
-//                        console.log(name)
                         if (root.mode == 1){
-                            maze.start = [ix,iy]
-//                            console.log("set the start position to " + maze.stringstart)
+                            maze.setstart(ix ,iy)
                             root.mode = 0;
                         }
                         else if (root.mode == 2){
-                            maze.end = [ix,iy]
-//                            console.log("set the end position to " + maze.stringend)
+                            maze.setend(ix,iy)
                             root.mode = 0
                         }
                         else if (root.mode == 3){
-                            maze.obs = [ix, iy]
-//                            console.log("set the obstacle position to " + maze.stringobs)
-//                            root.mode = 0
-                        }
-                        }
-                }
-                Rectangle {
-                    id : rect
-                    anchors.fill: parent
-                    color : colors
-                    border.color : "grey"
-                }
-                Timer{
-                    interval:5;
-                    running:true;
-                    repeat:true;
-                    property string startID : ""
-                    property string endID : ""
-                    property var obsID
-                    onTriggered: {
-                        startID = maze.stringstart
-                        endID = maze.stringend
-                        obsID = maze.stringobs
-                        if (startID == name){
-                            rect.color = "red"
-                        }
-                        else if (endID == name){
-                            rect.color = "green"
-                        }
-                        else{
-                            rect.color = "white"
-                        }
-                        for (var i = 0; i < obsID.length; i++){
-                            if (obsID[i] == name)
-                                rect.color = "black"
+                            maze.setobs(ix,iy)
                         }
                     }
                 }
@@ -240,6 +217,8 @@ Rectangle{
                 onClicked : {
                     root.mode = 4
                     console.log(root.mode)
+                    maze.pathplanning()
+//                    maze.setnewpathplanning(1)
                 }
             }
             Button {
@@ -274,9 +253,7 @@ Rectangle{
                 width : 230
                 text : "Reset All"
                 onClicked : {
-                    maze.start = [1,1]
-                    maze.end = [9,9]
-                    maze.resetobs
+                    maze.reset()
                 }
             }
             Button {
@@ -284,14 +261,13 @@ Rectangle{
                 width : 230
                 text : "Quit"
                 onClicked : {
-//                    root.mode = 6
-//                    console.log(root.mode)
+                    root.mode = 6
+                    console.log(root.mode)
                     maze.quit()
                 }
             }
         }
         Grid{
-//            height:300;
             id : paramListView;
             anchors {top: settingListView.bottom}
             verticalItemAlignment: Grid.AlignVCenter;
@@ -307,11 +283,13 @@ Rectangle{
             }
             Slider {
                 id : episode
-                maximumValue: 100
+                from : 0
+                to : 100
+//                maximumValue: 100
                 stepSize: 1
                 value : 100
                 onValueChanged: {
-                    maze.maxepisode = value.toFixed(0)
+                    maze.maxepisode(value.toFixed(0))
                 }
             }
             Text{
@@ -323,11 +301,13 @@ Rectangle{
             }
             Slider {
                 id : learningrate
-                maximumValue: 1
+                from : 0
+                to : 1
+//                maximumValue: 1
                 stepSize: 0.01
                 value : 0.01
                 onValueChanged: {
-                    maze.learningrate = value.toFixed(2)
+                    maze.learningrate(value.toFixed(2))
                 }
             }
             Text{
@@ -339,11 +319,13 @@ Rectangle{
             }
             Slider {
                 id : discountfactor
-                maximumValue: 1
+                from : 0
+                to : 1
+//                maximumValue: 1
                 stepSize: 0.01
                 value : 0.9
                 onValueChanged: {
-                    maze.discountfactor = value.toFixed(2)
+                    maze.discountfactor(value.toFixed(2))
                 }
             }
             Text{
@@ -355,11 +337,13 @@ Rectangle{
             }
             Slider {
                 id : egreedy
-                maximumValue: 1
+                from : 0
+                to : 1
+//                maximumValue: 1
                 stepSize: 0.01
                 value : 0.9
                 onValueChanged: {
-                    maze.egreedy = value.toFixed(2)
+                    maze.egreedy(value.toFixed(2))
                 }
             }
             Text{
@@ -367,48 +351,4 @@ Rectangle{
             }
         }
     }
-//    Rectangle{
-//        id : toolBar
-//        width : parent.width; height : 30
-//        color : activePalette.window
-//        anchors.bottom : root.bottom
-//
-//        Button {
-//            id : newButton
-//            anchors { left : parent.left; verticalCenter: parent.verticalCenter }
-//            text : "New Path-Planning"
-//            onClicked : console.log("This doesn't do anything yet...")
-//        }
-//        Rectangle{
-//            id : button2
-//            width : 100; height : 30
-//            anchors.bottom : toolBar.bottom
-//            Button {
-//                anchors { left : parent.right; verticalCenter: parent.verticalCenter; }
-//                text : "Set obstacles"
-//                onClicked : {
-//                    console.log("emmmm")
-//                }
-//            }
-//        }
-
-//        gradient : Gradient {
-//            GradientStop{
-//                position : 0.0
-//                color: {
-//                    if (mouseArea.pressed)
-//                        return activePalette.dark
-//                    else
-//                        return activePalette.light
-//                }
-//            }
-//            GradientStop { position : 1.0; color: activePalette.button }
-//        }
-//        Text {
-//            id : episode
-//            anchors { right : parent.right; verticalCenter : parent.verticalCenter }
-//            color : activePalette.buttonText
-//            text : "Episodes: ?"
-//        }
-//    }
 }
