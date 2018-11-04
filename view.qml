@@ -12,31 +12,31 @@ Rectangle{
 
     SystemPalette { id: activePalette }
 
-    function updateqml(){
-        console.log("update")
+//  white  #ffffff
+//  red  #ff0000
+    property string redposition
+    function resetqml(){
         for (var i = 0; i < mazeview.contentItem.children.length - 1; i++){
+//            if(mazeview.contentItem.children[i].color == "#ff0000")
+//                console.log(mazeview.contentItem.children[i].id)
+            mazeview.contentItem.children[i].color = "white"
+//            console.log(mazeview.contentItem.children[i].id)
 //            console.log(mazeview.contentItem.children[i].color)
-//            console.log(maze.obsnum())
-//            mazeview.contentItem.children[i].color = "red"
+        }
+    }
+
+    function updateqml(){
+        for (var i = 0; i < mazeview.contentItem.children.length - 1; i++){
+//            console.log(i)
+            if(mazeview.contentItem.children[i].color == "#ff0000")
+                mazeview.contentItem.children[i].color = "white"
             if(mazeview.contentItem.children[i].id == maze.robotstring()){
-//                console.log(mazeview.currentItem.id)
+//                console.log(mazeview.contentItem.children[i].id)
+//                console.log("yes")
                 mazeview.contentItem.children[i].color = "red"
             }
-//            else if(mazeview.contentItem.children[i].id == maze.endstring()){
-//                mazeview.contentItem.children[i].color = "green"
-//            }
-//            else{
-//                for(var j = 0; j < maze.obsnum(); j++){
-////                    console.log(maze.obsstring())
-//                    if(mazeview.contentItem.children[i].id == maze.obsstring()[j])
-//                        mazeview.contentItem.children[i].color = "black"
-//                }
-//            }
         }
-//        var timeStart = new Date().getTime();
-//        while (new Date().getTime() - timeStart < 500) {
-//            // Do nothing
-//        }
+//        maze.printinfo("update")
     }
 
     property int mode : 0
@@ -166,15 +166,26 @@ Rectangle{
                     anchors.fill: parent
                     onClicked: {
                         if (root.mode == 1){
+                            for (var i = 0; i < mazeview.contentItem.children.length - 1; i++){
+                                if(mazeview.contentItem.children[i].id == maze.robotstring())
+                                    mazeview.contentItem.children[i].color = "white"
+                            }
                             maze.setstart(ix ,iy)
                             root.mode = 0;
+                            parent.color = "red"
                         }
                         else if (root.mode == 2){
+                            for (var i = 0; i < mazeview.contentItem.children.length - 1; i++){
+                                if(mazeview.contentItem.children[i].id == maze.endstring())
+                                    mazeview.contentItem.children[i].color = "white"
+                            }
                             maze.setend(ix,iy)
                             root.mode = 0
+                            parent.color = "green"
                         }
                         else if (root.mode == 3){
                             maze.setobs(ix,iy)
+                            parent.color = "black"
                         }
                     }
                 }

@@ -27,6 +27,7 @@ class QLearningTable:
 
     def learn(self, s, a, r, s_):
         self.check_state_exist(s_)  # 检测 q_table 中是否存在 s_ (见后面标题内容)
+        # print(s + '  ' + s_)
         q_predict = self.q_table.loc[s, a]
         if s_ != 'terminal':
             q_target = r + self.gamma * self.q_table.loc[s_, :].max()  # 下个 state 不是 终止符

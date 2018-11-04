@@ -3,7 +3,7 @@
 import os
 import sys
 import time
-import threading
+import threading, multiprocessing
 
 from PyQt5.QtCore import pyqtProperty, QObject, QUrl, QTimer, pyqtSlot
 from PyQt5.QtQml import qmlRegisterType, QQmlComponent, QQmlEngine
@@ -12,7 +12,9 @@ from PyQt5.QtGui import QGuiApplication
 
 from RL_brain import QLearningTable
 
-global view
+# def print10000():
+#     for i in range(100000):
+#         print(i)
 
 class Maze(QObject):
     def __init__(self, parent=None):
@@ -37,7 +39,6 @@ class Maze(QObject):
         self._start[1] = y
         self._robot = self._start
         # print(self._start)
-        root.updateqml()
 
     @pyqtSlot(int, int)
     def setend(self, x, y):
@@ -45,7 +46,6 @@ class Maze(QObject):
         self._end[0] = x
         self._end[1] = y
         # print(self._end)
-        root.updateqml()
 
     @pyqtSlot(int, int)
     def setobs(self, x, y):
@@ -53,7 +53,6 @@ class Maze(QObject):
         if [x,y] not in self._obs:
             self._obs.append([x,y])
         # print(self._obs)
-        root.updateqml()
 
     @pyqtSlot()
     def reset(self):
@@ -62,7 +61,14 @@ class Maze(QObject):
         self._start = [1, 1]
         self._end = [9, 9]
         self._obs = []
-        root.updateqml()
+        root.resetqml()
+        #
+        # t1 = threading.Thread(target=root.resetqml)
+        # t2 = threading.Thread(target=print10000)
+        # t1.start()
+        # t2.start()
+        # t1.join()
+        # t2.join()
 
     @pyqtSlot(bool)
     def setnewpathplanning(self, setter):
@@ -109,8 +115,13 @@ class Maze(QObject):
         self._egreedy = egreedy
         # print(self._egreedy)
 
+    @pyqtSlot()
+    def printinfo(self):
+        print("updated")
+
     # observation after action
     def step(self, action):
+        global root
         # next state
         next_s = self._robot
         if action == 0:
@@ -134,7 +145,7 @@ class Maze(QObject):
             reward = 1
             done = True
             next_s = 'terminal'
-            print("win")
+            # print("win")
             return next_s, reward, done
         # punish
         for obs in self._obs:
@@ -142,46 +153,54 @@ class Maze(QObject):
                 reward = -1
                 done = True
                 next_s = 'terminal'
-                print("fail")
+                # print("fail")
                 return next_s, reward, done
         # nothing
         reward = 0
         done = False
-        return next_s, reward, done
+        return str(next_s), reward, done
 
     @pyqtSlot()
     def pathplanning(self):
         global root
+        global view
         RL = QLearningTable(actions=list(range(self.n_actions)), learning_rate=self._learningrate,
                             reward_decay=self._discountfactor, e_greedy=self._egreedy)
-        for episode in range(2):
+        for episode in range(self._maxepisode):
+            # print(self._maxepisode)
+            print(episode)
             # reset
             self._robot = self._start
             # initialize observation
-            observation = self._robot
-            root.updateqml()
+            observation = str(self._robot)
 
             while True:
                 # choose action
-                action = RL.choose_action(str(observation))
+                action = RL.choose_action(observation)
                 # get new observation
                 next_observation, reward, done = self.step(action)
                 # learn from this observation
-                RL.learn(str(observation),action,reward,str(next_observation))
+                # print(observation)
+                RL.learn(observation,action,reward,next_observation)
                 # update observation
                 observation = next_observation
+
                 # print qtable
                 # print(RL.q_table)
                 # print(self._robot)
-                thread = threading.Thread(target=root.updateqml())
-                thread.start()
-                thread.join()
-                # root.updateqml()
-                # time.sleep(0.5)
+                # thread = threading.Thread(target=root.updateqml())
+                # thread.start()
+                # thread.join()
+                # timer = QTimer()
+                # timer.start(2000)
+                # root = view.rootObject()
+                # timer.timeout.connect(root.updateqml)
+                root.updateqml()
+                # view.show()
                 if done:
                     break
 
-        print(RL.q_table)
+        # print(RL.q_table)
 
 if __name__ == '__main__':
     # create application instance
@@ -203,8 +222,18 @@ if __name__ == '__main__':
     view.show()
 
     root = view.rootObject()
-    root.updateqml()
-
+    # root.updateqml()
+    # def loop():
+    #     while 1:
+    #         root.updateqml()
+    #         time.sleep(0.5)
+    # loop()
+    # t = threading.Thread(target=loop)
+    # t2 = threading.Thread(target=view.show)
+    # t.start()
+    # t2.start()
+    # t.join()
+    # t2.join()
     # timer = QTimer()
     # timer.start(2000)
     # root = view.rootObject()
