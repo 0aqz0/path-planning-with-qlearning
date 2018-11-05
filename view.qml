@@ -1,9 +1,7 @@
 // author : 0aqz0
 // date: 2018/11/1
-//import Maze 1.0 as Maze
 import QtQuick 2.6
 import QtQuick.Controls 2.0
-//import QtQuick.Controls.Styles 1.4
 
 Rectangle{
     id : root
@@ -17,40 +15,23 @@ Rectangle{
     property string redposition
     function resetqml(){
         for (var i = 0; i < mazeview.contentItem.children.length - 1; i++){
-//            if(mazeview.contentItem.children[i].color == "#ff0000")
-//                console.log(mazeview.contentItem.children[i].id)
             mazeview.contentItem.children[i].color = "white"
-//            console.log(mazeview.contentItem.children[i].id)
-//            console.log(mazeview.contentItem.children[i].color)
         }
     }
-    function finalroot(){
-//        console.log(maze.finalpathlen())
-        for (var i = 0; i < maze.finalpathlen(); i++){
-//            console.log(maze.finalpathlist()[i])
-            for (var j = 0; j < mazeview.contentItem.children.length - 1; j++){
-//                console.log(mazeview.contentItem.children[j].id)
-                if(mazeview.contentItem.children[j].id == maze.finalpathlist()[i]){
-//                    console.log(mazeview.contentItem.children[j].id)
-                    mazeview.contentItem.children[j].color = "red"
-                    break
-                }
-            }
-        }
-    }
-    function updateqml(){
-        for (var i = 0; i < mazeview.contentItem.children.length - 1; i++){
-//            console.log(i)
-            if(mazeview.contentItem.children[i].color == "#ff0000")
-                mazeview.contentItem.children[i].color = "white"
-            if(mazeview.contentItem.children[i].id == maze.robotstring()){
-//                console.log(mazeview.contentItem.children[i].id)
-//                console.log("yes")
-                mazeview.contentItem.children[i].color = "red"
-            }
-        }
-//        maze.printinfo("update")
-    }
+//    function finalroot(){
+////        console.log(maze.finalpathlen())
+//        for (var i = 0; i < maze.finalpathlen(); i++){
+////            console.log(maze.finalpathlist()[i])
+//            for (var j = 0; j < mazeview.contentItem.children.length - 1; j++){
+////                console.log(mazeview.contentItem.children[j].id)
+//                if(mazeview.contentItem.children[j].id == maze.finalpathlist()[i]){
+////                    console.log(mazeview.contentItem.children[j].id)
+//                    mazeview.contentItem.children[j].color = "red"
+//                    break
+//                }
+//            }
+//        }
+//    }
 
     property int mode : 0
 //  1-----set the start
@@ -76,7 +57,7 @@ Rectangle{
             ListElement { name: "(1,7)"; colors : "white"; ix : 1; iy : 7 }
             ListElement { name: "(1,8)"; colors : "white"; ix : 1; iy : 8 }
             ListElement { name: "(1,9)"; colors : "white"; ix : 1; iy : 9 }
-           
+
             ListElement { name: "(2,1)"; colors : "white"; ix : 2; iy : 1 }
             ListElement { name: "(2,2)"; colors : "white"; ix : 2; iy : 2 }
             ListElement { name: "(2,3)"; colors : "white"; ix : 2; iy : 3 }
@@ -86,7 +67,7 @@ Rectangle{
             ListElement { name: "(2,7)"; colors : "white"; ix : 2; iy : 7 }
             ListElement { name: "(2,8)"; colors : "white"; ix : 2; iy : 8 }
             ListElement { name: "(2,9)"; colors : "white"; ix : 2; iy : 9 }
-            
+
             ListElement { name: "(3,1)"; colors : "white"; ix : 3; iy : 1 }
             ListElement { name: "(3,2)"; colors : "white"; ix : 3; iy : 2 }
             ListElement { name: "(3,3)"; colors : "white"; ix : 3; iy : 3 }
@@ -96,7 +77,7 @@ Rectangle{
             ListElement { name: "(3,7)"; colors : "white"; ix : 3; iy : 7 }
             ListElement { name: "(3,8)"; colors : "white"; ix : 3; iy : 8 }
             ListElement { name: "(3,9)"; colors : "white"; ix : 3; iy : 9 }
-            
+
             ListElement { name: "(4,1)"; colors : "white"; ix : 4; iy : 1 }
             ListElement { name: "(4,2)"; colors : "white"; ix : 4; iy : 2 }
             ListElement { name: "(4,3)"; colors : "white"; ix : 4; iy : 3 }
@@ -106,7 +87,7 @@ Rectangle{
             ListElement { name: "(4,7)"; colors : "white"; ix : 4; iy : 7 }
             ListElement { name: "(4,8)"; colors : "white"; ix : 4; iy : 8 }
             ListElement { name: "(4,9)"; colors : "white"; ix : 4; iy : 9 }
-            
+
             ListElement { name: "(5,1)"; colors : "white"; ix : 5; iy : 1 }
             ListElement { name: "(5,2)"; colors : "white"; ix : 5; iy : 2 }
             ListElement { name: "(5,3)"; colors : "white"; ix : 5; iy : 3 }
@@ -116,7 +97,7 @@ Rectangle{
             ListElement { name: "(5,7)"; colors : "white"; ix : 5; iy : 7 }
             ListElement { name: "(5,8)"; colors : "white"; ix : 5; iy : 8 }
             ListElement { name: "(5,9)"; colors : "white"; ix : 5; iy : 9 }
-            
+
             ListElement { name: "(6,1)"; colors : "white"; ix : 6; iy : 1 }
             ListElement { name: "(6,2)"; colors : "white"; ix : 6; iy : 2 }
             ListElement { name: "(6,3)"; colors : "white"; ix : 6; iy : 3 }
@@ -126,7 +107,7 @@ Rectangle{
             ListElement { name: "(6,7)"; colors : "white"; ix : 6; iy : 7 }
             ListElement { name: "(6,8)"; colors : "white"; ix : 6; iy : 8 }
             ListElement { name: "(6,9)"; colors : "white"; ix : 6; iy : 9 }
-            
+
             ListElement { name: "(7,1)"; colors : "white"; ix : 7; iy : 1 }
             ListElement { name: "(7,2)"; colors : "white"; ix : 7; iy : 2 }
             ListElement { name: "(7,3)"; colors : "white"; ix : 7; iy : 3 }
@@ -146,7 +127,7 @@ Rectangle{
             ListElement { name: "(8,7)"; colors : "white"; ix : 8; iy : 7 }
             ListElement { name: "(8,8)"; colors : "white"; ix : 8; iy : 8 }
             ListElement { name: "(8,9)"; colors : "white"; ix : 8; iy : 9 }
-            
+
             ListElement { name: "(9,1)"; colors : "white"; ix : 9; iy : 1 }
             ListElement { name: "(9,2)"; colors : "white"; ix : 9; iy : 2 }
             ListElement { name: "(9,3)"; colors : "white"; ix : 9; iy : 3 }
@@ -202,6 +183,23 @@ Rectangle{
                         }
                     }
                 }
+                Timer{
+                    interval: 20; running: true; repeat: true
+                    onTriggered: {
+                        parent.color = "white"
+                        if(parent.id == maze.robotstring()){
+                            parent.color = "red"
+                        }
+                        if(parent.id == maze.endstring()){
+                            parent.color = "green"
+                        }
+                        for (var i = 0; i < maze.obsnum(); i++){
+                            if(parent.id == maze.obsstring()[i]){
+                                parent.color = "black"
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -241,8 +239,7 @@ Rectangle{
                 onClicked : {
                     root.mode = 4
                     console.log(root.mode)
-                    maze.pathplanning()
-//                    maze.setnewpathplanning(1)
+                    maze.go()
                 }
             }
             Button {
@@ -309,7 +306,6 @@ Rectangle{
                 id : episode
                 from : 0
                 to : 200
-//                maximumValue: 100
                 stepSize: 1
                 value : 100
                 onValueChanged: {
@@ -327,7 +323,6 @@ Rectangle{
                 id : learningrate
                 from : 0
                 to : 1
-//                maximumValue: 1
                 stepSize: 0.01
                 value : 0.01
                 onValueChanged: {
@@ -345,7 +340,6 @@ Rectangle{
                 id : discountfactor
                 from : 0
                 to : 1
-//                maximumValue: 1
                 stepSize: 0.01
                 value : 0.9
                 onValueChanged: {
@@ -363,7 +357,6 @@ Rectangle{
                 id : egreedy
                 from : 0
                 to : 1
-//                maximumValue: 1
                 stepSize: 0.01
                 value : 0.9
                 onValueChanged: {

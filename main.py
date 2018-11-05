@@ -3,18 +3,14 @@
 import os
 import sys
 import time
-import threading, multiprocessing
+import _thread
 
-from PyQt5.QtCore import pyqtProperty, QObject, QUrl, QTimer, pyqtSlot
-from PyQt5.QtQml import qmlRegisterType, QQmlComponent, QQmlEngine
+from PyQt5.QtCore import QObject, QUrl, pyqtSlot
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QGuiApplication
 
 from RL_brain import QLearningTable
 
-# def print10000():
-#     for i in range(100000):
-#         print(i)
 
 class Maze(QObject):
     def __init__(self, parent=None):
@@ -31,7 +27,7 @@ class Maze(QObject):
         self.action_space = ['u', 'd', 'l', 'r']
         self.n_actions = len(self.action_space)
         self.newpathplanning = False
-        self.finalpath = []
+        # self.finalpath = []
 
     @pyqtSlot(int, int)
     def setstart(self, x, y):
@@ -62,7 +58,7 @@ class Maze(QObject):
         self._start = [1, 1]
         self._end = [9, 9]
         self._obs = []
-        self.finalpath = []
+        # self.finalpath = []
         root.resetqml()
 
     @pyqtSlot(bool)
@@ -110,19 +106,24 @@ class Maze(QObject):
         self._egreedy = egreedy
         # print(self._egreedy)
 
+    # @pyqtSlot()
+    # def printinfo(self):
+    #     print("updated")
+
+    # @pyqtSlot(result = 'QStringList')
+    # def finalpathlist(self):
+    #     return self.finalpath
+
+    # @pyqtSlot(result = int)
+    # def finalpathlen(self):
+    #     return len(self.finalpath)
+
     @pyqtSlot()
-    def printinfo(self):
-        print("updated")
-
-    @pyqtSlot(result = 'QStringList')
-    def finalpathlist(self):
-        return self.finalpath
-
-    @pyqtSlot(result = int)
-    def finalpathlen(self):
-        return len(self.finalpath)
+    def go(self):
+        self.newpathplanning = True
 
     # observation after action
+    @pyqtSlot()
     def step(self, action):
         global root
         # next state
@@ -174,12 +175,12 @@ class Maze(QObject):
             self._robot = self._start.copy()
             # initialize observation
             observation = str(self._robot)
+            time.sleep(1)
 
             while True:
                 # record the final path
-                if(episode == self._maxepisode - 1):
-                    self.finalpath.append(str("(" + str(int(self._robot[0])) + "," + str(int(self._robot[1])) + ")"))
-
+                # if(episode == self._maxepisode - 1):
+                #     self.finalpath.append(str("(" + str(int(self._robot[0])) + "," + str(int(self._robot[1])) + ")"))
 
                 # choose action
                 action = RL.choose_action(observation)
@@ -190,28 +191,25 @@ class Maze(QObject):
                 # update observation
                 observation = next_observation
 
-                # print qtable
-                # print(RL.q_table)
-                # print(self._robot)
-                # thread = threading.Thread(target=root.updateqml())
-                # thread.start()
-                # thread.join()
-                # timer = QTimer()
-                # timer.start(2000)
-                # root = view.rootObject()
-                # timer.timeout.connect(root.updateqml)
-                # root.updateqml()
-                # view.show()
+                # sleep for qml's update
+                time.sleep(0.2)
+                # print("#######")
                 if done:
                     break
 
-        # print(RL.q_table)
-        # self.finalpath.append("(9,9)")
-        # print(self.finalpath)
-        root.finalroot()
-
 
 if __name__ == '__main__':
+    # create maze instance
+    maze = Maze()
+    # start a new thread
+    def threadforpathplanning():
+        while True:
+            if maze.newpathplanning:
+                maze.pathplanning()
+                maze.newpathplanning = False
+            time.sleep(0.5)
+    _thread.start_new_thread(threadforpathplanning,())
+
     # create application instance
     app = QGuiApplication(sys.argv)
     view = QQuickView()
@@ -221,7 +219,6 @@ if __name__ == '__main__':
 
     qmlFile = os.path.join(os.path.dirname(__file__), 'view.qml')
 
-    maze = Maze()
     context = view.rootContext()
     context.setContextProperty("maze", maze)
 
@@ -231,30 +228,6 @@ if __name__ == '__main__':
     view.show()
 
     root = view.rootObject()
-    # root.updateqml()
-    # def loop():
-    #     while 1:
-    #         root.updateqml()
-    #         time.sleep(0.5)
-    # loop()
-    # t = threading.Thread(target=loop)
-    # t2 = threading.Thread(target=view.show)
-    # t.start()
-    # t2.start()
-    # t.join()
-    # t2.join()
-    # timer = QTimer()
-    # timer.start(2000)
-    # root = view.rootObject()
-    # timer.timeout.connect(root.updateqml)
-
-    # while True:
-        # root.updateqml()
-        # time.sleep(1)
-        # if(maze.newpathplanning):
-        #     pass
-
-
 
     res = app.exec_()
 
