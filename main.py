@@ -31,6 +31,7 @@ class Maze(QObject):
         self.action_space = ['u', 'd', 'l', 'r']
         self.n_actions = len(self.action_space)
         self.newpathplanning = False
+        self.finalpath = []
 
     @pyqtSlot(int, int)
     def setstart(self, x, y):
@@ -61,14 +62,8 @@ class Maze(QObject):
         self._start = [1, 1]
         self._end = [9, 9]
         self._obs = []
+        self.finalpath = []
         root.resetqml()
-        #
-        # t1 = threading.Thread(target=root.resetqml)
-        # t2 = threading.Thread(target=print10000)
-        # t1.start()
-        # t2.start()
-        # t1.join()
-        # t2.join()
 
     @pyqtSlot(bool)
     def setnewpathplanning(self, setter):
@@ -119,6 +114,14 @@ class Maze(QObject):
     def printinfo(self):
         print("updated")
 
+    @pyqtSlot(result = 'QStringList')
+    def finalpathlist(self):
+        return self.finalpath
+
+    @pyqtSlot(result = int)
+    def finalpathlen(self):
+        return len(self.finalpath)
+
     # observation after action
     def step(self, action):
         global root
@@ -167,20 +170,22 @@ class Maze(QObject):
         RL = QLearningTable(actions=list(range(self.n_actions)), learning_rate=self._learningrate,
                             reward_decay=self._discountfactor, e_greedy=self._egreedy)
         for episode in range(self._maxepisode):
-            # print(self._maxepisode)
-            print(episode)
             # reset
-            self._robot = self._start
+            self._robot = self._start.copy()
             # initialize observation
             observation = str(self._robot)
 
             while True:
+                # record the final path
+                if(episode == self._maxepisode - 1):
+                    self.finalpath.append(str("(" + str(int(self._robot[0])) + "," + str(int(self._robot[1])) + ")"))
+
+
                 # choose action
                 action = RL.choose_action(observation)
                 # get new observation
                 next_observation, reward, done = self.step(action)
                 # learn from this observation
-                # print(observation)
                 RL.learn(observation,action,reward,next_observation)
                 # update observation
                 observation = next_observation
@@ -195,12 +200,16 @@ class Maze(QObject):
                 # timer.start(2000)
                 # root = view.rootObject()
                 # timer.timeout.connect(root.updateqml)
-                root.updateqml()
+                # root.updateqml()
                 # view.show()
                 if done:
                     break
 
         # print(RL.q_table)
+        # self.finalpath.append("(9,9)")
+        # print(self.finalpath)
+        root.finalroot()
+
 
 if __name__ == '__main__':
     # create application instance

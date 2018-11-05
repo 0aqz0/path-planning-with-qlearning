@@ -24,7 +24,20 @@ Rectangle{
 //            console.log(mazeview.contentItem.children[i].color)
         }
     }
-
+    function finalroot(){
+//        console.log(maze.finalpathlen())
+        for (var i = 0; i < maze.finalpathlen(); i++){
+//            console.log(maze.finalpathlist()[i])
+            for (var j = 0; j < mazeview.contentItem.children.length - 1; j++){
+//                console.log(mazeview.contentItem.children[j].id)
+                if(mazeview.contentItem.children[j].id == maze.finalpathlist()[i]){
+//                    console.log(mazeview.contentItem.children[j].id)
+                    mazeview.contentItem.children[j].color = "red"
+                    break
+                }
+            }
+        }
+    }
     function updateqml(){
         for (var i = 0; i < mazeview.contentItem.children.length - 1; i++){
 //            console.log(i)
@@ -295,7 +308,7 @@ Rectangle{
             Slider {
                 id : episode
                 from : 0
-                to : 100
+                to : 200
 //                maximumValue: 100
                 stepSize: 1
                 value : 100
