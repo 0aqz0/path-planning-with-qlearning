@@ -27,7 +27,10 @@ class Maze(QObject):
         self.action_space = ['u', 'd', 'l', 'r']
         self.n_actions = len(self.action_space)
         self.newpathplanning = False
-        # self.finalpath = []
+        self.finalpath = []
+        self.isfinalpath = False
+        self.currentepisode = 0
+        self.currentqtable = ""
 
     @pyqtSlot(int, int)
     def setstart(self, x, y):
@@ -58,7 +61,10 @@ class Maze(QObject):
         self._start = [1, 1]
         self._end = [9, 9]
         self._obs = []
-        # self.finalpath = []
+        self.finalpath = []
+        self.isfinalpath = False
+        self.currentepisode = 0
+        self.currentqtable = ""
         root.resetqml()
 
     @pyqtSlot(bool)
@@ -110,13 +116,25 @@ class Maze(QObject):
     # def printinfo(self):
     #     print("updated")
 
-    # @pyqtSlot(result = 'QStringList')
-    # def finalpathlist(self):
-    #     return self.finalpath
+    @pyqtSlot(result = 'QStringList')
+    def finalpathlist(self):
+        return self.finalpath
 
-    # @pyqtSlot(result = int)
-    # def finalpathlen(self):
-    #     return len(self.finalpath)
+    @pyqtSlot(result = int)
+    def finalpathlen(self):
+        return len(self.finalpath)
+
+    @pyqtSlot(result = bool)
+    def requestisfinalpath(self):
+        return self.isfinalpath
+
+    @pyqtSlot(result = int)
+    def requestepisode(self):
+        return self.currentepisode
+
+    @pyqtSlot(result = "QString")
+    def requestqtable(self):
+        return self.currentqtable
 
     @pyqtSlot()
     def go(self):
@@ -146,7 +164,7 @@ class Maze(QObject):
 
         # reward
         if next_s == self._end:
-            reward = 1
+            reward = 10
             done = True
             next_s = 'terminal'
             # print("win")
@@ -154,13 +172,13 @@ class Maze(QObject):
         # punish
         for obs in self._obs:
             if next_s == obs:
-                reward = -1
+                reward = -10
                 done = True
                 next_s = 'terminal'
                 # print("fail")
                 return next_s, reward, done
         # nothing
-        reward = 0
+        reward = -1
         done = False
         return str(next_s), reward, done
 
@@ -170,7 +188,12 @@ class Maze(QObject):
         global view
         RL = QLearningTable(actions=list(range(self.n_actions)), learning_rate=self._learningrate,
                             reward_decay=self._discountfactor, e_greedy=self._egreedy)
+        # update qtable
+        self.currentqtable = str(RL.q_table)
         for episode in range(self._maxepisode):
+            # update episode
+            self.currentepisode = episode + 1
+
             # reset
             self._robot = self._start.copy()
             # initialize observation
@@ -179,8 +202,8 @@ class Maze(QObject):
 
             while True:
                 # record the final path
-                # if(episode == self._maxepisode - 1):
-                #     self.finalpath.append(str("(" + str(int(self._robot[0])) + "," + str(int(self._robot[1])) + ")"))
+                if(episode == self._maxepisode - 1):
+                    self.finalpath.append(str("(" + str(int(self._robot[0])) + "," + str(int(self._robot[1])) + ")"))
 
                 # choose action
                 action = RL.choose_action(observation)
@@ -191,11 +214,15 @@ class Maze(QObject):
                 # update observation
                 observation = next_observation
 
+                # update qtable
+                self.currentqtable = str(RL.q_table)
                 # sleep for qml's update
                 time.sleep(0.2)
                 # print("#######")
                 if done:
                     break
+            # print(self.finalpath)
+        self.isfinalpath = True
 
 
 if __name__ == '__main__':

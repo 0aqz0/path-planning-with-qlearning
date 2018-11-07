@@ -1,7 +1,7 @@
 // author : 0aqz0
 // date: 2018/11/1
 import QtQuick 2.6
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.4
 
 Rectangle{
     id : root
@@ -198,6 +198,14 @@ Rectangle{
                                 parent.color = "black"
                             }
                         }
+                        if(maze.requestisfinalpath()){
+                            for (var i = 0; i < maze.finalpathlen(); i++){
+                                if(parent.id == maze.finalpathlist()[i]){
+                                    parent.color = "red"
+                                    break
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -213,7 +221,13 @@ Rectangle{
             id : episodeText
             anchors { right : parent.right; verticalCenter : parent.verticalCenter }
             color : activePalette.buttonText
-            text : "Episodes: ?"
+            text : maze.requestepisode()
+        }
+        Timer{
+            interval: 20; running: true; repeat: true
+            onTriggered: {
+                episodeText.text = maze.requestepisode()
+            }
         }
     }
     GroupBox{
@@ -365,6 +379,30 @@ Rectangle{
             }
             Text{
                 text : egreedy.value.toFixed(2)
+            }
+        }
+    }
+    GroupBox{
+        id : qtableview
+        width : 500; height : 390
+        anchors { right : root.right; bottom : infoBar.top}
+        title : "Q table"
+        clip : true
+        ScrollView{
+            width : parent.width; height : 340
+            anchors { bottom : parent.bottom }
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            clip : true
+            Text{
+                id : qtabletext
+                text : "Hello, I'm Q table!"
+                anchors.fill : parent
+            }
+        }
+        Timer{
+            interval: 20; running: true; repeat: true
+            onTriggered: {
+                qtabletext.text = maze.requestqtable()
             }
         }
     }
